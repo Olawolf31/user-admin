@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new Schema({
   name: {
@@ -15,32 +16,32 @@ const userSchema = new Schema({
     unique: true,
     lowercase: true,
     validate: {
-      validator: function (v) {
-        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+      validator: function (value) {
+        return validator.isEmail(value);
       },
-      message: "Please enter a valid email",
+      message: "Invalid email address",
     },
-    password: {
-      type: String,
-      required: [true, "password is required"],
-      min: 6,
-    },
-    phone: {
-      type: String,
-      required: [true, "phone number is required"],
-    },
-    is_verified: {
-      type: Number,
-      default: 0,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    image: {
-      contentType: String,
-      data: Buffer,
-    },
+  },
+  password: {
+    type: String,
+    required: [true, "password is required"],
+    min: 6,
+  },
+  phone: {
+    type: String,
+    required: [true, "phone number is required"],
+  },
+  is_verified: {
+    type: Number,
+    default: 0,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  image: {
+    contentType: String,
+    data: Buffer,
   },
 });
 

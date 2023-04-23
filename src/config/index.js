@@ -3,10 +3,14 @@ dotenv.config()
 
 const dev = {
     app: {
-        PORT: process.env.PORT
+        port: process.env.PORT,
+        jwtSecretKey: process.env.JWT_SECRET_KEY || "ezez4573j",
+        smtpUsername: process.env.SMTP_USERNAME,
+        smtpPassword: process.env.SMTP_PASSWORD,
+        clientUrl: process.env.CLIENT_URL
     },
     db: {
-        URL: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/booksDB"
+        url: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/usersDB"
     }
 }
 

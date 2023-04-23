@@ -14,7 +14,7 @@ app.use(cors());
 app.use(bodyParser.json());//json data
 app.use(bodyParser.urlencoded({ extended: true })); //from data
 
-const PORT = dev.app.PORT
+const PORT = dev.app.port
 
 //routes
 app.use('/api/users', userRoutes)
