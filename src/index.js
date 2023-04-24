@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Example app listening on port ${PORT}`)
-  connectDB()
+  await connectDB()
 })

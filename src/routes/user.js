@@ -12,6 +12,10 @@ const {
   loginUser,
   logOutUser,
   userProfile,
+  deleteUser,
+  updateUser,
+  forgetPassword,
+  resetPassword
 } = require("../controllers/userLogic");
 
 //user session
@@ -31,5 +35,9 @@ routes.post("/verify-email/", verifyEmail);
 routes.post("/login", isLoggedOut, loginUser);
 routes.get("/logout", logOutUser);
 routes.get("/", isLoggedIn, userProfile);
+routes.delete("/", isLoggedIn, deleteUser);
+routes.put("/", isLoggedIn, formidableMiddleware(), updateUser);
+routes.post("/forget-password", forgetPassword);
+routes.post("/reset-password", resetPassword);
 
 module.exports = routes;
