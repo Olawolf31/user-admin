@@ -149,7 +149,7 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // check that fields are not empty
+    // check if fields are missing
     if (!email || !password) {
       return res.status(404).json({
         message: "email or password is incorrect",
@@ -163,7 +163,7 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // check if user already exist by id
+    // check if user already exist by email
     const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({

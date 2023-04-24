@@ -6,6 +6,7 @@ const dev = require('./config/index')
 const connectDB = require('./config/db')
 const cookieParser = require('cookie-parser')
 const userRoutes = require('./routes/user')
+const adminRoutes = require('./routes/admin')
 
 
 const app = express();
@@ -25,6 +26,10 @@ const PORT = dev.app.port
 
 //routes
 app.use('/api/users', userRoutes)
+app.use('/api/admin', adminRoutes)
+
+
+//test route
 app.get('/', (req, res) => {
   res.send('Hello World!');
 })

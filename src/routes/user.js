@@ -37,7 +37,7 @@ routes.get("/logout", logOutUser);
 routes.get("/", isLoggedIn, userProfile);
 routes.delete("/", isLoggedIn, deleteUser);
 routes.put("/", isLoggedIn, formidableMiddleware(), updateUser);
-routes.post("/forget-password", forgetPassword);
-routes.post("/reset-password", resetPassword);
+routes.post("/forget-password", isLoggedOut, forgetPassword);
+routes.post("/reset-password", isLoggedOut, resetPassword);
 
 module.exports = routes;
