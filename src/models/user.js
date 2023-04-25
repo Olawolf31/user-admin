@@ -40,9 +40,14 @@ const userSchema = new Schema(
       type: Date,
       default: Date.now,
     },
-    image: {
+    /*     image: {
       contentType: String,
       data: Buffer,
+    } */
+
+    image: {
+      type: String,
+      default: "../../public/images/defaultUser",
     },
     is_admin: {
       type: Boolean,

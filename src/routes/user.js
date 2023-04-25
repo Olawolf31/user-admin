@@ -1,7 +1,7 @@
-const routes = require("express").Router();
-const formidableMiddleware = require("express-formidable");
+const userRoutes = require("express").Router();
 const session = require("express-session");
 const dev = require("../config/index");
+const upload = require("../middleware/fileUpload");
 
 //import validation middlewares
 const { isLoggedIn, isLoggedOut } = require("../middleware/auth");
@@ -15,11 +15,11 @@ const {
   deleteUser,
   updateUser,
   forgetPassword,
-  resetPassword
+  resetPassword,
 } = require("../controllers/userLogic");
 
 //user session
-routes.use(
+userRoutes.use(
   session({
     name: "user_session",
     secret: dev.app.sessionSecretKey,
@@ -30,14 +30,19 @@ routes.use(
 );
 
 //routes
-routes.post("/register", formidableMiddleware(), register);
-routes.post("/verify-email/", verifyEmail);
-routes.post("/login", isLoggedOut, loginUser);
-routes.get("/logout", logOutUser);
-routes.get("/", isLoggedIn, userProfile);
-routes.delete("/", isLoggedIn, deleteUser);
-routes.put("/", isLoggedIn, formidableMiddleware(), updateUser);
-routes.post("/forget-password", isLoggedOut, forgetPassword);
-routes.post("/reset-password", isLoggedOut, resetPassword);
+userRoutes.post("/register", upload.single("image"), register);
+userRoutes.post("/verify-email/", verifyEmail);
+userRoutes.post("/login", isLoggedOut, loginUser);
+userRoutes.get("/logout", logOutUser);
 
-module.exports = routes;
+//routes chaining
+userRoutes
+  .route("/")
+  .get(isLoggedIn, userProfile)
+  .delete(isLoggedIn, deleteUser)
+  .put(isLoggedIn, upload.single("image"), updateUser);
+
+userRoutes.post("/forget-password", isLoggedOut, forgetPassword);
+userRoutes.post("/reset-password", isLoggedOut, resetPassword);
+
+module.exports = userRoutes;

@@ -1,13 +1,6 @@
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
 const User = require("../models/user");
-const {
-  securePassword,
-  comparePassword,
-} = require("../helpers/bcryptPassword");
-const dev = require("../config/index");
-const sendEmailWithNodeMailer = require("../helpers/email");
-const { isEmail } = require("validator");
+const { comparePassword } = require("../helpers/bcryptPassword");
+const exceljs = require("exceljs");
 
 //Login User
 const loginAdmin = async (req, res) => {
@@ -77,7 +70,7 @@ const logoutAdmin = (req, res) => {
     req.session.destroy();
     //clear the cookies and pass the session
     res.clearCookie("admin_session");
-    res.status(201).json({
+    res.status(200).json({
       ok: true,
       message: "Log out successful",
     });
@@ -106,6 +99,111 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const deleteUserByAdmin = async (req, user) => {
+  try {
+    const { id } = req.params;
+
+    const findUser = await User.findById(id);
+    if (!findUser) {
+      return res.status(404).json({
+        message: "user was not found",
+      });
+    }
+
+    await User.findByIdAndDelete(id);
+
+    res.status(200).json({
+      ok: true,
+      message: "deleted user successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateUserByAdmin = async (req, res) => {
+  try {
+    // fetch the id of a user
+    const { id } = req.params;
+    // find user to update by id
+    const updatedData = await User.findByIdAndUpdate(
+      id,
+      { ...req.body },
+      { new: true }
+    );
+    if (!updatedData) {
+      return res.json(404).json({
+        message: "user was not found",
+      });
+    }
+    await updatedData.save();
+
+    if (!updatedData) {
+      return res.status(400).json({
+        message: "user was not updated",
+      });
+    }
+
+    res.status(200).json({
+      message: "user was updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const exportUsers = async (req, res) => {
+  try {
+    const workbook = new exceljs.Workbook();
+    const worksheet = workbook.addWorksheet("Users");
+    worksheet.columns = [
+      { header: "Name", key: "name" },
+      { header: "email", key: "email" },
+      { header: "Phone Number", key: "phone" },
+      { header: "Profile Picture", key: "avatar" },
+      { header: "Is Admin", key: "is_admin" },
+      { header: "Is Verified", key: "is_verified" },
+      { header: "Is Banned", key: "is_banned" },
+    ];
+
+    // fetch all the user's data
+    const userData = await User.find();
+
+    // map through the user
+    userData.map((user) => {
+      worksheet.addRow(user);
+    });
+
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" + "users.xlsx"
+    );
+    return workbook.xlsx.write(res).then(() => {
+      res.status(200).end();
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //admin-profile, reset password, forget password, dashboard -- CRUD --create user, read all users except admin
 
-module.exports = { loginAdmin, logoutAdmin, getAllUsers };
+module.exports = {
+  loginAdmin,
+  logoutAdmin,
+  getAllUsers,
+  deleteUserByAdmin,
+  updateUserByAdmin,
+  exportUsers,
+};

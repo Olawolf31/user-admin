@@ -4,11 +4,15 @@ const dev = require("../config/index");
 
 //import validation middlewares
 const { isLoggedIn, isLoggedOut } = require("../middleware/auth");
+const isAdmin = require("../middleware/isAdmin")
 
 const {
   loginAdmin,
   logoutAdmin,
   getAllUsers,
+  deleteUserByAdmin,
+  updateUserByAdmin,
+  exportUsers
 } = require("../controllers/adminLogic");
 
 //admin session
@@ -26,5 +30,9 @@ adminRoutes.use(
 adminRoutes.post("/login", isLoggedOut, loginAdmin);
 adminRoutes.get("/logout", isLoggedIn, logoutAdmin);
 adminRoutes.get("/dashboard", isLoggedIn, getAllUsers);
+adminRoutes.delete("/dashboard/:id", isAdmin, deleteUserByAdmin);
+adminRoutes.put("/dashboard/:id", isAdmin, updateUserByAdmin)
 
+//export user data in excel
+adminRoutes.get("/dashboard/export-excel-data", exportUsers)
 module.exports = adminRoutes;

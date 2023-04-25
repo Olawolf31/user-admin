@@ -20,8 +20,6 @@ app.use(bodyParser.urlencoded({ extended: true })); //form data
 app.use(express.json()); // for json
 app.use(express.urlencoded({ extended: true })); // for form data
 
-
-
 const PORT = dev.app.port
 
 //routes

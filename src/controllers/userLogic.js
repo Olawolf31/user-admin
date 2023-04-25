@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
 const User = require("../models/user");
 const {
   securePassword,
@@ -11,8 +10,10 @@ const { isEmail } = require("validator");
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.fields;
-    const { image } = req.files;
+    const { name, email, password, phone } = req.body;
+    /*  const { image } = req.files; */
+    //using express formidable, we use req.files
+    const image = req.file && req.file.path;
 
     //check if fields are not empty
     if (!name || !email || !password || !phone) {
@@ -35,12 +36,12 @@ const register = async (req, res) => {
       });
     }
 
-    //check if image is added and size is greater 1MB
-    if (image && image.size > 1000000) {
+    //check if image is added and size is greater 1MB - using express formidable
+    /*     if (image && image.size > 1000000) {
       return res.status(404).json({
         message: "Maximum image size is 1MB",
       });
-    }
+    } */
 
     //check if user already exist
     const userExist = await User.findOne({
@@ -112,20 +113,22 @@ const verifyEmail = async (req, res) => {
         });
       }
 
-      // create the user - without the image
+      // create the user
       const newUser = new User({
         name: name,
         email: email,
         password: hashedPassword,
         phone: phone,
         is_verified: 1,
+        image,
       });
 
       //check if image is true
-      if (image) {
+      /*       if (image) {
         newUser.image.contentType = image.type;
         newUser.image.data = fs.readFileSync(image.path);
-      }
+      } */
+
       // save the user
       const user = await newUser.save();
       if (!user) {
@@ -237,7 +240,6 @@ const userProfile = async (req, res) => {
 };
 
 //user CRUD operations
-
 const deleteUser = async (req, res) => {
   try {
     // if the user is logged in we always have req.session.userId = user._id
@@ -257,19 +259,20 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    if (!req.fields.password) {
+    if (!req.body.password) {
       return res.status(404).json({
         message: "password is missing",
       });
     }
     //if we have the password, then we have to hash the password
-    const hashedpassword = await securePassword(req.fields.password);
+    const hashedpassword = await securePassword(req.body.password);
 
     const updatedData = await User.findByIdAndUpdate(
       req.session.userId,
       {
-        ...req.fields,
+        ...req.body,
         password: hashedpassword,
+        image: req.file,
       },
       { new: true }
     );
@@ -282,12 +285,12 @@ const updateUser = async (req, res) => {
       });
     }
 
-    //check if image exists while updating
-    if (req.files.image) {
+    //check if image exists while updating (using formidable)
+    /*    if (req.files.image) {
       const { image } = req.files;
       updatedData.image.contentType = image.type;
       updatedData.image.data = fs.readFileSync(image.path);
-    }
+    } */
 
     await updatedData.save();
 
