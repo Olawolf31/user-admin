@@ -99,7 +99,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const deleteUserByAdmin = async (req, user) => {
+const deleteUserByAdmin = async (req, res) => {
   try {
     const { id } = req.params;
 

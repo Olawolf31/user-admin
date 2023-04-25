@@ -47,7 +47,7 @@ const userSchema = new Schema(
 
     image: {
       type: String,
-      default: "../../public/images/defaultUser",
+      default: "../../public/images/defaultUser.png",
     },
     is_admin: {
       type: Boolean,
